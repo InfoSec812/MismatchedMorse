@@ -22,5 +22,5 @@ mvn test
 
 ```
 mvn package
-java -cp target/morse-mismatches-1.0-SNAPSHOT.jar com.zanclus.interview.morse.mismatch.Main sample.txt
+java -jar target/morse-mismatches-1.0-SNAPSHOT.jar sample.txt
 ```
