@@ -8,7 +8,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Created by dphillips on 4/21/16.
+ * A program which attempts to decode Morse code without spaces between Morse characters by using a dictionary of
+ * allowed words.
  */
 public class Main {
 
@@ -62,8 +63,7 @@ public class Main {
                     hasMultipleMatches = true;
                 }
             } else {   // No exact match was found, find longest matching substring
-                String longestMatch = findBestMatch(word);
-                bestMatch = dictionary.get(longestMatch).get(0);
+                bestMatch = findBestMatch(word);
                 hasAmbiguousMatch = true;
             }
             output.append(bestMatch);
@@ -109,7 +109,7 @@ public class Main {
                 }
             }
         }
-        return longestMatch;
+        return dictionary.get(longestMatch).get(0);
     }
 
     List<String> findExactMatches(String word) {
