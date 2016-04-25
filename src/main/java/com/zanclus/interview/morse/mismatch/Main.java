@@ -122,15 +122,12 @@ public class Main {
      * @param word The Morse cyphertext to be checked against the dictionary
      * @return A {@link List<String>} of matching words from the dictionary
      */
-    List<String> findExactMatches(String word) {
-        List<String> matches = new ArrayList<>();
-        for (Map.Entry<String, ArrayList<String>> entry: dictionary.entrySet()) {
-            String morse = entry.getKey();
-            if (morse.contentEquals(word)) {
-                matches.addAll(entry.getValue().stream().collect(Collectors.toList()));
-            }
-        }
-        return matches;
+    List<Map.Entry<String, ArrayList<String>>> findExactMatches(String word) {
+        return dictionary
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().contentEquals(word))
+                .collect(Collectors.toList());
     }
 
     /**
