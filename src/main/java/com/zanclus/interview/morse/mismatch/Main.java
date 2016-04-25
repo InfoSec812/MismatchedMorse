@@ -27,9 +27,9 @@ public class Main {
      * @param argv The command-line arguments
      * @throws IOException If there is a problem reading the input file.
      */
-    static void main(String... argv) throws IOException {
-        String[] lines = null;
-        Files.lines(Paths.get(argv[0])).collect(Collectors.toList()).toArray(lines);
+    public static void main(String... argv) throws IOException {
+        String[] lines = new String[0];
+        lines = Files.lines(Paths.get(argv[0])).collect(Collectors.toList()).toArray(lines);
         Main main = new Main(lines);
     }
 
