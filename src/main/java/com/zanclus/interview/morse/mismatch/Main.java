@@ -34,9 +34,8 @@ public class Main {
     }
 
     /**
-     *
-     * @param lines
-     * @throws IOException
+     * Constructor. Also outputs the results of the program to STDOUT.
+     * @param lines The lines read from the input file
      */
     public Main(String[] lines) {
         System.out.print(loadInput(lines));
@@ -67,17 +66,18 @@ public class Main {
                 hasAmbiguousMatch = true;
             }
             output.append(bestMatch);
-            if (hasMultipleMatches) {
-                output.append("!");
-            }
-            if (hasAmbiguousMatch) {
-                output.append("?");
-            }
+            output.append(hasMultipleMatches?"!":"");
+            output.append(hasAmbiguousMatch?"?":"");
             output.append("\n");
         }
         return output.toString();
     }
 
+    /**
+     * Given multiple matches, find the one with the longest matching substring
+     * @param matches A list of potential matches
+     * @return A {@link List<String>} of the longest matches
+     */
     List<String> findLongestMatch(List<String> matches) {
         int shortest = MAX_LINE_LENGTH;
         List<String> multipleSameLengthMatches = new ArrayList<>();
@@ -93,12 +93,17 @@ public class Main {
         return multipleSameLengthMatches;
     }
 
+    /**
+     * Given a list of words with no exact matches, find the shortest/best match for the given cyphertext
+     * @param word The Morse code word to be checked against the dictionary
+     * @return A {@link String} containing the shortest matching word from the dictionary.
+     */
     String findBestMatch(String word) {
         String longestMatch = null;
         int longestMatchLen = 0;
         for (Map.Entry<String, ArrayList<String>> entry: dictionary.entrySet()) {
             String morse = entry.getKey();
-            int matchLength = findLongestMatchingSubstring(word, morse);
+            int matchLength = findLengthOfMatchingSubstring(word, morse);
             if (longestMatch==null) {
                 longestMatch = entry.getKey();
                 longestMatchLen = matchLength;
@@ -112,6 +117,11 @@ public class Main {
         return dictionary.get(longestMatch).get(0);
     }
 
+    /**
+     * Find any/all exact matches for the given Morse cyphertext.
+     * @param word The Morse cyphertext to be checked against the dictionary
+     * @return A {@link List<String>} of matching words from the dictionary
+     */
     List<String> findExactMatches(String word) {
         List<String> matches = new ArrayList<>();
         for (Map.Entry<String, ArrayList<String>> entry: dictionary.entrySet()) {
@@ -189,7 +199,13 @@ public class Main {
         dictionary.get(morse).add(word);
     }
 
-    int findLongestMatchingSubstring(String inputMorse, String dictionaryMorse) {
+    /**
+     * Given a pair of Morse values, return the length of the matching portions of the strings
+     * @param inputMorse The input Morse cyphertext
+     * @param dictionaryMorse The dictionary Morse cyphertext
+     * @return The length of the matching portions of the strings
+     */
+    int findLengthOfMatchingSubstring(String inputMorse, String dictionaryMorse) {
         int retVal = 0;
         for (int x=0; x<inputMorse.length(); x++) {
             if (inputMorse.length()>=(x+1) && dictionaryMorse.length()>=(x+1)) {
