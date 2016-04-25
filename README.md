@@ -1,6 +1,6 @@
 # Programming Interview Question - Morse Code Mismatches
 
-Problem description is in [Morse Mismatches](Morse Mismatches.doc)
+Problem description is in [Morse Mismatches](Morse Mismatches.doc?raw=true)
 
 ## Prerequisites
 * Java 8
