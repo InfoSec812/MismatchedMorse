@@ -21,53 +21,64 @@ public class Main {
     private Map<String, ArrayList<String>> dictionary = new HashMap<>();
     private List<String> wordList = new ArrayList<>();
 
-    public static void main(String... argv) throws IOException {
-        Main main = new Main(argv);
+    /**
+     * Entry-point for the application
+     * @param argv The command-line arguments
+     * @throws IOException If there is a problem reading the input file.
+     */
+    static void main(String... argv) throws IOException {
+        String[] lines = null;
+        Files.lines(Paths.get(argv[0])).collect(Collectors.toList()).toArray(lines);
+        Main main = new Main(lines);
     }
 
-    public Main(String[] argv) throws IOException {
-        loadInput(argv[0]);
+    /**
+     *
+     * @param lines
+     * @throws IOException
+     */
+    public Main(String[] lines) {
+        System.out.print(loadInput(lines));
     }
 
     /**
      * Main body of the program.
      */
-    private void init() {
+    String init() {
+        StringBuilder output = new StringBuilder();
+        output.setLength(0);
         for (String word: wordList) {
             boolean hasMultipleMatches = false;
             boolean hasAmbiguousMatch = false;
             String bestMatch = null;
-            List<String> matches = new ArrayList<>();
-            findExactMatches(word, matches);
-            if (matches.size()==0) {   // No exact match was found, find longest matching substring
+            List<String> matches = findExactMatches(word);
+            if (matches.size()==1) {
+                bestMatch = matches.get(0);
+            } else if (matches.size()>1) {  // One or more exact matches were found.
+                // Multiple matches found. Check to see if there is one which is shorted than the others
+                List<String> multipleSameLengthMatches = findLongestMatch(matches);
+                bestMatch = multipleSameLengthMatches.get(0);
+                if (multipleSameLengthMatches.size()>1) {
+                    hasMultipleMatches = true;
+                }
+            } else {   // No exact match was found, find longest matching substring
                 String longestMatch = findBestMatch(word);
                 bestMatch = dictionary.get(longestMatch).get(0);
                 hasAmbiguousMatch = true;
-            } else {  // One or more exact matches were found.
-                if (matches.size()>1) {
-                    // Multiple matches found. Check to see if there is one which is shorted than the others
-                    List<String> multipleSameLengthMatches = findLongestMatch(matches);
-                    bestMatch = multipleSameLengthMatches.get(0);
-                    if (multipleSameLengthMatches.size()>1) {
-                        hasMultipleMatches = true;
-                    }
-                } else {
-                    // Only 1 exact match was found. Print it on a line by itself.
-                    bestMatch = matches.get(0);
-                }
             }
-            System.out.print(bestMatch);
+            output.append(bestMatch);
             if (hasMultipleMatches) {
-                System.out.print("!");
+                output.append("!");
             }
             if (hasAmbiguousMatch) {
-                System.out.print("?");
+                output.append("?");
             }
-            System.out.println();
+            output.append("\n");
         }
+        return output.toString();
     }
 
-    private List<String> findLongestMatch(List<String> matches) {
+    List<String> findLongestMatch(List<String> matches) {
         int shortest = MAX_LINE_LENGTH;
         List<String> multipleSameLengthMatches = new ArrayList<>();
         for (String item: matches) {   // Iterate through matches
@@ -82,7 +93,7 @@ public class Main {
         return multipleSameLengthMatches;
     }
 
-    private String findBestMatch(String word) {
+    String findBestMatch(String word) {
         String longestMatch = null;
         int longestMatchLen = 0;
         for (Map.Entry<String, ArrayList<String>> entry: dictionary.entrySet()) {
@@ -101,25 +112,26 @@ public class Main {
         return longestMatch;
     }
 
-    private void findExactMatches(String word, List<String> matches) {
+    List<String> findExactMatches(String word) {
+        List<String> matches = new ArrayList<>();
         for (Map.Entry<String, ArrayList<String>> entry: dictionary.entrySet()) {
             String morse = entry.getKey();
             if (morse.contentEquals(word)) {
                 matches.addAll(entry.getValue().stream().collect(Collectors.toList()));
             }
         }
+        return matches;
     }
 
     /**
      * Load and parse the input
-     * @param fileName
+     * @param lines A {@link Stream} of Strings which represents the lines of the input data.
      * @throws IOException
      */
-    private void loadInput(String fileName) throws IOException {
-        Stream<String> lines = Files.lines(Paths.get(fileName));
+    String loadInput(String[] lines) {
         int state = MORSE_TABLE;
 
-        for (String line: lines.collect(Collectors.toList())) {
+        for (String line: lines) {
             switch(state) {
                 case MORSE_TABLE:
                     if (line.trim().contentEquals("*")) {
@@ -142,7 +154,7 @@ public class Main {
                     break;
                 case CYPHERTEXT:
                     if (line.trim().contentEquals("*")) {
-                        init();
+                        return init();
                     } else {
                         if (line.trim().length()>0) {
                             for (String item: line.trim().split(" ")) {
@@ -157,13 +169,14 @@ public class Main {
                     System.err.println("Unknown state!");
             }
         }
+        return null;
     }
 
     /**
      * Given a word, convert the word to Morse and store the plaintext and cyphertext in a map
      * @param word The input word from the dictionary
      */
-    private void convertWordToMorse(String word) {
+    void convertWordToMorse(String word) {
         StringBuilder sb = new StringBuilder();
         for (char letter: word.toCharArray()) {
             String strLetter = Character.toString(letter);
@@ -176,7 +189,7 @@ public class Main {
         dictionary.get(morse).add(word);
     }
 
-    private int findLongestMatchingSubstring(String inputMorse, String dictionaryMorse) {
+    int findLongestMatchingSubstring(String inputMorse, String dictionaryMorse) {
         int retVal = 0;
         for (int x=0; x<inputMorse.length(); x++) {
             if (inputMorse.length()>=(x+1) && dictionaryMorse.length()>=(x+1)) {
