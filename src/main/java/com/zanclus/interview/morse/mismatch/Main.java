@@ -125,9 +125,9 @@ public class Main {
     List<Map.Entry<String, ArrayList<String>>> findExactMatches(String word) {
         return dictionary
                 .entrySet()
-                .stream()
-                .filter(entry -> entry.getKey().contentEquals(word))
-                .collect(Collectors.toList());
+                .stream()                                               // Iterate over items in the dictionary
+                .filter(entry -> entry.getKey().contentEquals(word))    // Filter for exact matches
+                .collect(Collectors.toList());                          // Return a list of exact matches as a List
     }
 
     /**
